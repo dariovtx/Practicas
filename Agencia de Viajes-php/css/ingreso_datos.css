@@ -1,0 +1,44 @@
+b,ul{margin: 0;
+padding: 0;
+border: 0;
+font-size: 100%;
+font: inherit;
+color:white;
+}
+.button {
+border: none;
+background: rgb(141, 154, 214);
+color: #001570;
+padding: 4px;
+font-size: 18px;
+border-radius: 5px;
+position: relative;
+box-sizing: border-box;
+transition: all 500ms ease;
+}
+.button:hover {
+background: rgba(0,0,0,0.2);
+color: rgb(152, 141, 214);
+box-shadow: inset 0 0 0 3px rgb(154, 141, 214);
+}
+.register-title {
+width: 330px;
+line-height: 43px;
+margin: 50px auto 20px;
+font-size: 19px;
+font-weight: 500;
+font-family: verdana;
+color: #000770;
+text-align: center;
+background: rgb(141, 146, 214);
+border-radius: 3px;
+}
+.register {
+margin: 0 auto;
+width: 290px;
+color: white;
+padding: 20px;
+background: #150070;
+border-radius: 3px;
+font-family: verdana;
+}
