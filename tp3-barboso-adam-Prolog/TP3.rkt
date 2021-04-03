@@ -1,0 +1,164 @@
+;Se define la tabla inicial la cual se usara para las demas funciones que contiene las luces encendidas del tablero.
+
+(define tablero-inicial-1 (lambda ()'((1 . 3) (5 . 2) (1 . 1) (1 . 4) (3 . 5))))
+
+;--------------------------------------------------------------------------------------------------------------------------------
+
+;Esta funcion nos retorna verdadero o falso dependiendo si la posicion que le pasamos esta incluida o no en la lista que le pasamos.
+
+(define encendida? (lambda (lt n1 n2)
+                     (if (null? lt)
+                         #f
+                         (if(equal? (car lt) (cons n1 n2))
+                              #t
+                            (encendida? (cdr lt) n1 n2)))))
+
+;--------------------------------------------------------------------------------------------------------------------------------
+
+;cambiar-luz: agrega o quita un elemento de la lista pero antes de hacerlo verifica
+;que los valores que les pasamos esten en el rango adecuado.
+
+(define cambia-luz (lambda(t g s)
+                                  (if(or (or(> g 5) (> s 5)) (or(< g 1) (< s 1)))
+                                  t
+                                  (if(null? t) 
+                                          (list(cons g s))
+                                        (if(equal? (car t) (cons g s)) 
+                                                (cdr t)
+                                                  (cons (car t)(cambia-luz (cdr t) g s )) )
+                                                   
+                                                  ))))  
+
+;--------------------------------------------------------------------------------------------------------------------------------
+
+;pulsa: cambia los valores en X y en Y de la coordenada marcada
+;utiliza la funcion ejeY para los valores que estan por encima y debajo
+;ejeX para los valores que estan en los costados
+
+ (define pulsa (lambda(t y x)
+              (ejeX(ejeY(cambia-luz t y x) y x) y x)))
+
+(define ejeY(lambda(t y x)
+             (cambia-luz(cambia-luz t (- y 1) x)(+ y 1) x) ))
+
+(define ejeX(lambda(t y x)
+             (cambia-luz(cambia-luz t y  (- x 1)) y (+ x 1)) ))
+
+;--------------------------------------------------------------------------------------------------------------------------------
+
+;fin-del-juego? verifica que la lista este o no vacia si lo esta retorna true de lo contraro false.
+
+(define fin-del-juego? (lambda (t)
+                          (if(null? t)
+                             #t
+                             #f)))
+
+;--------------------------------------------------------------------------------------------------------------------------------
+
+;aplica-pulsaciones toma una lista con las pulsaciones a aplicar y retorna el nuevo tablero
+
+(define aplica-pulsaciones (lambda (t l)
+                              (if(null? l)
+                                 t
+                                (aplica-pulsaciones (pulsa t (caar l) (cdar l)) (cdr l)))))
+
+;--------------------------------------------------------------------------------------------------------------------------------
+
+;pulsaciones-ganadoras: devuelve una lista la cual contiene la menor cantidad de pulsaciones para ganar el jeugo
+
+(define pulsaciones-ganadoras (lambda (t)
+                                 (if(null? t)
+                                    '()
+                                (obtener-jugada t (solucion) (fila5) (pulsar1))
+                                )) )
+
+;obtener-jugada:
+;lt es la tabla
+;ls es la lista resultado que se devuelve
+;l5 contiene los patrones que tiene que tener la fila cinto si se puede ganar el juego
+;lp contiene las primeras jugadas que se debe aplicar segun l5
+;en esta funcion ademas uso otras dos funciones ademas de las que ya tenia definida previamente: "obtener-jugada","primera-jugada".
+;basicamente esta funcion realiza todas las acciones que pulsaciones-ganadoras no puede, es la que crea la lista solucion
+;es la que obtiene la primera jugada si el juego tiene solucion.
+(define obtener-jugada ( lambda ( lt ls l5 lp )
+                 ( if ( fin-del-juego? lt )
+                   ls
+                    ( if( = ( caar(menor-fila lt )) 5)
+                         ( if ( hay-solucion lt l5 )
+                             ( obtener-jugada ( aplica-pulsaciones lt ( primera-jugada lt l5 lp )) ( append ls (primera-jugada lt l5 lp )) l5 lp )
+                             '()
+                             )
+                        ( obtener-jugada ( aplica-pulsaciones lt ( list( cons (+ 1 ( caar ( menor-fila lt ))) ( cdar( menor-fila lt )))))
+                                         ( append ls ( list( cons (+ 1 ( caar ( menor-fila lt ))) ( cdar ( menor-fila lt ))))) l5 lp) ))))
+
+;fila5 es una lista de sublistas que contiene todas las tablas que tienen solucion
+
+(define fila5 (lambda()'(((5 . 1) (5 . 5)) ((5 . 2) (5 . 4)) ((5 . 1) (5 . 2) (5 . 3))
+                                             ((5 . 3)(5 . 4)(5 . 5)) ((5 . 1) (5 . 3) (5 . 4))
+                                             ((5 . 2) (5 . 3) (5 . 5)) ((5 . 1) (5 . 2) (5 . 4) (5 . 5)))))
+
+;pulsar1 contiene una lista con sublistas que contienen las jugadas que se deben realizar segun fila5
+;tiene todos sus elementos acomodados para coincidir. 
+
+(define pulsar1 (lambda () '(((1 . 1) (1 . 2)) ((1 . 1)(1 . 3))
+                              ((1 . 2)) ((1 . 4)) ((1 . 5))
+                              ((1 . 1)) ((1 . 3)) )))
+ 
+;es una funcion que contiene la lista a cargar con la solucion
+
+(define solucion (lambda()'()))
+
+;ordena una lista de pares
+
+(define ordenar (lambda (x)
+                 (if(null? (cdr x))
+                          x
+                        (if(>  (cdar x) (cdadr x))
+                                (append (list (cadr x)) (ordenar(append(list(car x))(cddr x))))
+                              (append (list (car x)) (ordenar(cdr x)))  )
+                             
+                        )))
+      
+;obtiene el menor par de una lista de pares
+
+(define menor-fila(lambda(x)
+                   (if(null? (cdr x))
+                    x
+                    (if( < (caar x) (caadr x))
+                       (menor-fila (append (list(car x)) (cddr x)))
+                    (if (=(caar x)(caadr x))
+                        (if(< (cdar x)(cdadr x) )
+                         (menor-fila (append (list (car x))(cddr x)))
+                         (menor-fila (cdr x)))
+                       (menor-fila (cdr x)) )))))
+
+
+;primera-jugada busca en fila5 cual coincide con la tabla mientras al mismo tiempo lo busca en pulsar1 las primeras jugadas
+
+
+(define primera-jugada(lambda (x y z)
+                           (if(null? y)
+                              y
+                              (if (equal? (length x)(length (car y)))
+                                   (if(equal? x (car y) )
+                                      (car z)
+                                      (primera-jugada x (cdr y) (cdr z))
+                                  )
+                                   (primera-jugada x (cdr y) (cdr z))
+                                   ))))
+
+;hay-solucion: verifica que exista solcion si encuentra el mismo patron en fila5 y en la tabla
+
+(define hay-solucion(lambda (x y)
+                           (if(null? y)
+                              #f
+                              (if (= (length x) (length(car y)))
+                                   (if(equal? x (car y) )
+                                      #t
+                                      (hay-solucion x (cdr y))
+                                  )
+                                   (hay-solucion x (cdr y)))
+                      )))
+
+
+

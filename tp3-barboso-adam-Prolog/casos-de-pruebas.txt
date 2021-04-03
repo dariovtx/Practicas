@@ -1,0 +1,46 @@
+Casos de prueba:
+
+>(tablero-inicial-1)=> ‘((1 . 3) (5 . 2) (1 . 1) (1 . 4) (3 . 5))
+
+
+> ( encendida?(tablero-inicial-1) 1 3 )
+#t
+> ( encendida?(tablero-inicial-1) 1 2 )
+#f
+> ( encendida?(tablero-inicial-1) 5 1 )
+#f
+> ( encendida?(tablero-inicial-1) 5 2 )
+#t
+
+> ( cambiar-luz (tablero-inicial-1) 5 2 )=>((1 . 3) (1 . 1) (1 . 4) (3 . 5))
+
+> ( cambiar-luz (tablero-inicial-1) 5 1 )=>((1 . 3) (5 . 2) (1 . 1) (1 . 4) (3 . 5) (5 . 1))
+
+
+>(pulsa (tablero-inicial-1) 1 2)=> '((2 . 2) (1 . 2) (5 . 2) (1 . 4) (3 . 5)) 
+
+> (pulsa (tablero-inicial-1) 1 3)=> ((5 . 2) (1 . 1) (3 . 5) (2 . 3) (1 . 2))
+
+> (pulsa (tablero-inicial-1) 5 3)=> ((1 . 3) (1 . 1) (1 . 4) (3 . 5) (5 . 3) (4 . 3) (5 . 4))
+
+> (fin-del-juego? (tablero-inicial-1))
+#f
+> (fin-del-juego? '())
+#t
+
+>(aplica-pulsaciones (tablero-inicial-1) '((2 . 1) (2 . 3) (2 . 4) (3 . 1) (3 . 5) (4 . 2) (4 . 3) (5 . 4) )) => '((5 . 5) (5 . 4) (4 . 5))
+
+> (aplica-pulsaciones '((5 . 1) (5 . 5)) '((1 . 1) (1 . 2) (2 . 3) (3 . 1) (3 . 3) (3 . 4) (4 . 1) (4 . 3) (4 . 5) (5 . 4) (5 . 5)))
+'()
+
+>(pulsaciones-ganadoras (tablero-inicial-1))=> ( (2 . 1) (2 . 3) (2 . 4) (3 . 1) (3 . 5) (4 . 2) (4 . 3) (5 . 4) (5. 5) )
+
+
+>(let ((tab-inicial ‘((1 . 3) (5 . 2) (1 . 1) (1 . 4) (3 . 5))))
+(fin-del-juego?
+(aplica-pulsaciones tab-inicial
+(pulsaciones-ganadoras tab-inicial))))
+
+
+>(pulsaciones-ganadoras '((5 . 1) (5 . 5)))=>((1 . 1) (1 . 2) (2 . 3) (3 . 1) (3 . 3) (3 . 4) (4 . 1) (4 . 3) (4 . 5) (5 . 4) (5 . 5))
+
